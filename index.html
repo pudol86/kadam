@@ -1,55 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta property="og:image" content="/og-image.jpeg">
-    <title>Advertiser Account</title>
-        <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-59R5V5S');</script>
-    <!-- End Google Tag Manager -->
-    <!-- Yandex.Metrika counter -->
-    <script type="text/unicscript" unic-purpose-id="1" >
-        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-        m[i].l=1*new Date();
-        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+<meta charset="UTF-8">
+<title>Video Page</title>
 
-        ym(91257281, "init", {
-            clickmap:true,
-            trackLinks:true,
-            accurateTrackBounce:true,
-            webvisor:true
-        });
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/91257281" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-      <meta name="csrf-param" content="_csrf-kadam-pub">
-<meta name="csrf-token" content="Id8OqRNm0fG5AFrZXUROUpf5jaYhopBBEkg2NpWeT4Jv7HTdXjGVmtVKLoEZLgoG0avp_mmSqCtWHU9846cB2A==">
+<style>
+body { margin:0; font-family:Arial; background:#000; color:#fff; text-align:center; }
+video { width:100%; max-height:60vh; }
 
-<link href="https://cdn.jsdelivr.net/npm/@mdi/font@3.x/css/materialdesignicons.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
-<link href="/assets/css/bundle.d50fb227.css" rel="stylesheet">
-<script>const CSRF = {name: '_csrf-kadam-pub', token: 'Id8OqRNm0fG5AFrZXUROUpf5jaYhopBBEkg2NpWeT4Jv7HTdXjGVmtVKLoEZLgoG0avp_mmSqCtWHU9846cB2A=='};
-const siteLanguage = 'en';</script></head>
+.overlay {
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.85);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+
+.popup {
+    background:#fff;
+    color:#000;
+    padding:25px;
+    border-radius:12px;
+    width:320px;
+    text-align:center;
+}
+
+button {
+    padding:10px 20px;
+    border:none;
+    background:#111;
+    color:#fff;
+    border-radius:6px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+.game-box {
+    width:80px;
+    height:80px;
+    background:#eee;
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    margin:8px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:30px;
+}
+</style>
+</head>
 <body>
 
+<video id="myVideo" controls>
+    <source src="https://cdn.videy.co/iNMbHsm91.mp4" type="video/mp4">
+</video>
 
-<noscript>
-  <strong>We're sorry but vue doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-</noscript>
-<div id="app"></div>
+<div id="eventPopup" class="overlay" style="display:none;">
+    <div class="popup">
+        <h3>🎉 Event Spesial Penonton</h3>
+        <p>Hari ini kami mengadakan mini game interaktif untuk pengguna.</p>
+        <p>Mainkan game sederhana untuk melanjutkan ke halaman promo spesial.</p>
+        <button onclick="startGame()">Mainkan Sekarang</button>
+    </div>
+</div>
+
+<div id="gamePopup" class="overlay" style="display:none;">
+    <div class="popup">
+        <h3>Pilih Salah Satu Kotak</h3>
+        <div class="game-box" onclick="finishGame()">🎁</div>
+        <div class="game-box" onclick="finishGame()">🎁</div>
+        <div class="game-box" onclick="finishGame()">🎁</div>
+        <p style="font-size:12px; margin-top:10px;">Klik salah satu untuk melanjutkan</p>
+    </div>
+</div>
 
 <script>
-    window.internal_id = 193006;
+let video = document.getElementById("myVideo");
+
+video.addEventListener("play", function() {
+    video.pause();
+    document.getElementById("eventPopup").style.display="flex";
+});
+
+function startGame(){
+    document.getElementById("eventPopup").style.display="none";
+    document.getElementById("gamePopup").style.display="flex";
+}
+
+function finishGame(){
+    window.location.href = "https://oversightexcitement.com/ecpp2d2yf?key=780644cc073355ffdcb57a8c6dbbd9b4";
+}
 </script>
-<script src="/assets/js/main.d50fb227.bundle.js"></script>
-<script src="/assets/js/polyfill.d50fb227.bundle.js"></script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"0c8b9708dc8f4bd1b79a71ed5cc448ed","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+
 </body>
 </html>
