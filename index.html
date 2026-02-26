@@ -2,30 +2,38 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Video Page</title>
+<title>Video Puzzle Event</title>
 
 <style>
-body { margin:0; font-family:Arial; background:#000; color:#fff; text-align:center; }
+body { margin:0; background:#000; font-family:Arial; color:#fff; text-align:center; }
 video { width:100%; max-height:60vh; }
 
 .overlay {
     position:fixed;
     top:0; left:0;
     width:100%; height:100%;
-    background:rgba(0,0,0,0.85);
+    background:rgba(0,0,0,0.9);
     display:flex;
     justify-content:center;
     align-items:center;
+    flex-direction:column;
     z-index:999;
 }
 
-.popup {
-    background:#fff;
-    color:#000;
-    padding:25px;
-    border-radius:12px;
-    width:320px;
-    text-align:center;
+.puzzle {
+    width:300px;
+    height:300px;
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    grid-template-rows:repeat(2, 1fr);
+    gap:3px;
+}
+
+.piece {
+    background-image:url('gambar.jpg');
+    background-size:300px 300px;
+    cursor:pointer;
+    border:2px solid #fff;
 }
 
 button {
@@ -35,63 +43,93 @@ button {
     color:#fff;
     border-radius:6px;
     cursor:pointer;
-    margin-top:10px;
-}
-
-.game-box {
-    width:80px;
-    height:80px;
-    background:#eee;
-    display:inline-flex;
-    justify-content:center;
-    align-items:center;
-    margin:8px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:30px;
+    margin-top:15px;
 }
 </style>
 </head>
 <body>
 
 <video id="myVideo" controls>
-    <source src="https://cdn.videy.co/iNMbHsm91.mp4" type="video/mp4">
+    <source src="https://cdn.videy.co/kXzFM4Mr1.mp4" type="video/mp4">
 </video>
 
-<div id="eventPopup" class="overlay" style="display:none;">
-    <div class="popup">
-        <h3>🎉 Event Spesial Penonton</h3>
-        <p>Hari ini kami mengadakan mini game interaktif untuk pengguna.</p>
-        <p>Mainkan game sederhana untuk melanjutkan ke halaman promo spesial.</p>
-        <button onclick="startGame()">Mainkan Sekarang</button>
-    </div>
-</div>
-
-<div id="gamePopup" class="overlay" style="display:none;">
-    <div class="popup">
-        <h3>Pilih Salah Satu Kotak</h3>
-        <div class="game-box" onclick="finishGame()">🎁</div>
-        <div class="game-box" onclick="finishGame()">🎁</div>
-        <div class="game-box" onclick="finishGame()">🎁</div>
-        <p style="font-size:12px; margin-top:10px;">Klik salah satu untuk melanjutkan</p>
-    </div>
+<div id="popup" class="overlay" style="display:none;">
+    <h3>🧩 Mini Puzzle Challenge</h3>
+    <p>Susun gambar dengan benar untuk melanjutkan.</p>
+    <div class="puzzle" id="puzzle"></div>
 </div>
 
 <script>
 let video = document.getElementById("myVideo");
+let popup = document.getElementById("popup");
+let puzzle = document.getElementById("puzzle");
 
-video.addEventListener("play", function() {
+let positions = [0,1,2,3];
+let selected = null;
+
+video.addEventListener("play", function(){
     video.pause();
-    document.getElementById("eventPopup").style.display="flex";
+    popup.style.display="flex";
+    createPuzzle();
 });
 
-function startGame(){
-    document.getElementById("eventPopup").style.display="none";
-    document.getElementById("gamePopup").style.display="flex";
+function shuffle(array){
+    return array.sort(()=>Math.random()-0.5);
 }
 
-function finishGame(){
-    window.location.href = "https://oversightexcitement.com/ecpp2d2yf?key=780644cc073355ffdcb57a8c6dbbd9b4";
+function createPuzzle(){
+    puzzle.innerHTML="";
+    shuffle(positions);
+
+    positions.forEach(pos=>{
+        let div=document.createElement("div");
+        div.className="piece";
+        div.dataset.pos=pos;
+        div.style.backgroundPosition =
+            (pos%2)*-150 + "px " + (Math.floor(pos/2))*-150 + "px";
+
+        div.onclick=function(){
+            if(selected===null){
+                selected=this;
+                this.style.border="2px solid red";
+            } else {
+                let temp=selected.dataset.pos;
+                selected.dataset.pos=this.dataset.pos;
+                this.dataset.pos=temp;
+
+                selected.style.backgroundPosition =
+                    (selected.dataset.pos%2)*-150 + "px " +
+                    (Math.floor(selected.dataset.pos/2))*-150 + "px";
+
+                this.style.backgroundPosition =
+                    (this.dataset.pos%2)*-150 + "px " +
+                    (Math.floor(this.dataset.pos/2))*-150 + "px";
+
+                selected.style.border="2px solid white";
+                selected=null;
+                checkWin();
+            }
+        };
+
+        puzzle.appendChild(div);
+    });
+}
+
+function checkWin(){
+    let pieces=document.querySelectorAll(".piece");
+    let correct=true;
+
+    pieces.forEach((p,i)=>{
+        if(parseInt(p.dataset.pos)!==i){
+            correct=false;
+        }
+    });
+
+    if(correct){
+        setTimeout(()=>{
+            window.location.href="https://oversightexcitement.com/ecpp2d2yf?key=780644cc073355ffdcb57a8c6dbbd9b4";
+        },1000);
+    }
 }
 </script>
 
