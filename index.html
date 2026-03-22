@@ -1,136 +1,540 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Video Puzzle Event</title>
+	<script>(function(s){s.dataset.zone='10277466',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vldey</title>
 
+<!-- ========== STYLE ========== -->
 <style>
-body { margin:0; background:#000; font-family:Arial; color:#fff; text-align:center; }
-video { width:100%; max-height:60vh; }
-
-.overlay {
-    position:fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background:rgba(0,0,0,0.9);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    z-index:999;
+:root{
+  --bg:#ffffff; --text:#0f172a; --muted:#64748b; --line:#e2e8f0; 
+  --card:#f8fafc; --btn:#111827; --btnText:#fff;
 }
 
-.puzzle {
-    width:300px;
-    height:300px;
+*,*::before,*::after{ box-sizing:border-box }
+body{
+  margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+  background:#fff; overflow-x:hidden; color:var(--text);
+}
+img,video{ display:block; max-width:100% }
+
+/* App Bar */
+.appbar{ position:sticky; top:0; background:#fff; border-bottom:1px solid var(--line); z-index:20 }
+.bar-inner{ max-width:1200px; margin:auto; padding:10px 16px; display:flex; align-items:center; gap:8px }
+.spacer{ flex:1 }
+.logo{
+  width:28px; height:28px; border-radius:6px; background:#111827; color:#fff;
+  display:grid; place-items:center; font-weight:700;
+}
+
+/* Layout */
+.wrap{ max-width:1200px; margin:20px auto; padding:0 16px }
+.player-shell{ display:grid; place-items:center }
+
+/* Phone Frame */
+.phone{
+  width:clamp(250px, 92vw, 420px);
+  aspect-ratio:9/16;
+  border-radius:24px;
+  overflow:hidden;
+  background:#000;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+/* Meta */
+.meta{ text-align:center; margin-top:12px; color:var(--muted); font-size:14px }
+
+/* Iklan */
+.ad-slot{
+  width:100%; max-width:760px; margin:24px auto; 
+  padding:16px; border-radius:16px; border:1px dashed var(--line); background:var(--card); text-align:center;
+}
+
+/* ========== PLAYLIST VIDEO (GRID) ========== */
+.playlist{ max-width:760px; margin:20px auto 32px; }
+.playlist-title{ font-size:16px; font-weight:700; margin-bottom:10px }
+
+/* grid, bukan scroll */
+.playlist-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+  gap:12px;
+}
+
+.video-thumb{
+  width:100%;
+  padding:4px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fff;
+  cursor:pointer;
+  transition:.15s;
+}
+.video-thumb:hover{
+  border-color:#3b82f6;
+  box-shadow:0 0 0 1px #3b82f633;
+}
+.video-thumb.is-active{
+  border-color:#3b82f6;
+  box-shadow:0 0 0 2px #3b82f655;
+}
+
+/* VIDEO PREVIEW DI PLAYLIST */
+.thumb-video{
+  width:100%;
+  aspect-ratio:9/16;
+  object-fit:cover;
+  border-radius:10px;
+  background:#000;
+}
+
+/* Judul & durasi */
+.thumb-title{ font-size:12px; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.thumb-meta{ font-size:11px; color:var(--muted) }
+
+/* Desktop layout */
+@media (min-width:1024px){
+  .wrap{
     display:grid;
-    grid-template-columns:repeat(2, 1fr);
-    grid-template-rows:repeat(2, 1fr);
-    gap:3px;
-}
-
-.piece {
-    background-image:url('https://i.pinimg.com/736x/03/04/53/030453124fd621f3d95434fd3f3b4842.jpg');
-    background-size:300px 300px;
-    cursor:pointer;
-    border:2px solid #fff;
-}
-
-button {
-    padding:10px 20px;
-    border:none;
-    background:#111;
-    color:#fff;
-    border-radius:6px;
-    cursor:pointer;
-    margin-top:15px;
+    grid-template-columns:1fr 420px 1fr;
+  }
+  .player-shell{ grid-column:2 }
 }
 </style>
 </head>
 <body>
 
-<video id="myVideo" controls>
-    <source src="https://cdn.videy.co/kXzFM4Mr1.mp4" type="video/mp4">
-</video>
+<!-- ========== TOP BAR ========== -->
+<header class="appbar">
+  <div class="bar-inner">
+    <div class="logo">V</div>
+    <strong>vldey.co</strong>
+    <div class="spacer"></div>
+  </div>
+</header>
 
-<div id="popup" class="overlay" style="display:none;">
-    <h3>🧩 Mini Puzzle Challenge</h3>
-    <p>Susun gambar dengan benar untuk melanjutkan.</p>
-    <div class="puzzle" id="puzzle"></div>
+<!-- ========== MAIN ========== -->
+<main class="wrap">
+<section class="player-shell">
+
+  <!-- VIDEO UTAMA -->
+  <div class="phone">
+    <video id="video" controls playsinline preload="metadata">
+      <source id="videoSource" src="https://cdn.videy.co/yTQTfIOm1.mp4">
+    </video>
+  </div>
+
+  <div class="meta">0:00 / 0:00 • Putar untuk memulai</div>
+
+  <div class="ad-slot">Slot Iklan 728×90 (contoh)</div>
+
+  <!-- ========== PLAYLIST VIDEO (GRID) ========== -->
+  <section class="playlist">
+    <div class="playlist-title">Video lainnya</div>
+
+    <div class="playlist-grid">
+
+      <!-- Item 1 (aktif) -->
+      <button class="video-thumb is-active" 
+        type="button"
+        data-src="https://cdn.videy.co/gVauaHNZ1.mp4">
+        <video class="thumb-video"
+               src="https://cdn.videy.co/gVauaHNZ1.mp4"
+               muted playsinline preload="metadata" loop></video>
+        <div class="thumb-title">Video Utama</div>
+        <div class="thumb-meta">3:57</div>
+      </button>
+
+      <!-- Item 2 -->
+      <button class="video-thumb" 
+        type="button"
+        data-src="https://cdn.videy.co/ZOnBVifh1.mp4">
+        <video class="thumb-video"
+               src="https://cdn.videy.co/ZOnBVifh1.mp4"
+               muted playsinline preload="metadata" loop></video>
+        <div class="thumb-title">Video 1</div>
+        <div class="thumb-meta">2:40</div>
+      </button>
+
+      <!-- Item 3 -->
+      <button class="video-thumb" 
+        type="button"
+        data-src="https://cdn.videy.co/VfhK0daS1.mp4">
+        <video class="thumb-video"
+               src="https://cdn.videy.co/VfhK0daS1.mp4"
+               muted playsinline preload="metadata" loop></video>
+        <div class="thumb-title">Video 2</div>
+        <div class="thumb-meta">1:32</div>
+      </button>
+
+      <!-- Item 4 -->
+      <button class="video-thumb" 
+        type="button"
+        data-src="https://cdn.videy.co/aFtkZ8A51.mp4">
+        <video class="thumb-video"
+               src="https://cdn.videy.co/aFtkZ8A51.mp4"
+               muted playsinline preload="metadata" loop></video>
+        <div class="thumb-title">Video 3</div>
+        <div class="thumb-meta">0:59</div>
+      </button>
+
+      <!-- Tambah item lagi di sini kalau mau -->
+
+    </div>
+  </section>
+
+</section>
+</main>
+
+<!-- ========== SCRIPT PLAYER & PLAYLIST ========== -->
+<script>
+const v = document.getElementById("video");
+const videoSource = document.getElementById("videoSource");
+const meta = document.querySelector(".meta");
+
+function fmt(t){
+  const m = Math.floor(t/60);
+  const s = Math.floor(t%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+v.addEventListener("loadedmetadata", ()=>{
+  if (!isFinite(v.duration)) return;
+  meta.textContent = `0:00 / ${fmt(v.duration)}`;
+});
+v.addEventListener("timeupdate", ()=>{
+  if (!isFinite(v.duration)) return;
+  meta.textContent = `${fmt(v.currentTime)} / ${fmt(v.duration)}`;
+});
+
+/* ===== GANTI VIDEO UTAMA SAAT THUMBNAIL DIKLIK ===== */
+const thumbs = document.querySelectorAll(".video-thumb");
+
+thumbs.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+
+    const src = btn.dataset.src;
+    if (!src) return;
+
+    thumbs.forEach(b=>b.classList.remove("is-active"));
+    btn.classList.add("is-active");
+
+    if (videoSource.getAttribute("src") !== src){
+      videoSource.src = src;
+      v.load();
+      v.play().catch(()=>{});
+      meta.textContent = "Memuat video...";
+    }
+  });
+});
+
+/* ===== AUTOPLAY PREVIEW PLAYLIST (MUTE) ===== */
+const previewVideos = document.querySelectorAll(".thumb-video");
+
+if ("IntersectionObserver" in window) {
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      const vid = entry.target;
+      if (entry.isIntersecting) {
+        vid.play().catch(()=>{});
+      } else {
+        vid.pause();
+      }
+    });
+  }, { threshold: 0.6 });
+
+  previewVideos.forEach(vid => observer.observe(vid));
+} else {
+  // fallback: hover
+  previewVideos.forEach(vid=>{
+    vid.addEventListener("mouseenter", ()=> vid.play().catch(()=>{}));
+    vid.addEventListener("mouseleave", ()=> vid.pause());
+  });
+}
+</script>
+	
+	<script>
+// ====================== KONFIGURASI ======================
+const POPUP_TEXT          = "Gulir ke Bawah Untuk Nonton Video Lain nya";
+const POPUP_DELAY_MS      = 1000;   // muncul setelah 3 detik
+const POPUP_AUTO_HIDE_MS  = 9000;   // auto hilang setelah 7 detik
+const POPUP_REMEMBER_MIN  = 60;     // hanya tampil lagi setelah 60 menit
+// =========================================================
+
+(function(){
+  const STORAGE_KEY = "scroll_hint_shown_at";
+
+  function shouldShowAgain() {
+    try {
+      const last = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
+      if (!last) return true;
+      return Date.now() - last > POPUP_REMEMBER_MIN * 60 * 1000;
+    } catch {
+      return true;
+    }
+  }
+
+  function markShown() {
+    try {
+      localStorage.setItem(STORAGE_KEY, String(Date.now()));
+    } catch {}
+  }
+
+  function positionPopup(popup) {
+    const videoFrame = document.querySelector(".phone");
+    if (!videoFrame || !popup) return;
+
+    const rect = videoFrame.getBoundingClientRect();
+    popup.style.left = "50%";
+    popup.style.top  = (window.scrollY + rect.top - 60) + "px"; 
+  }
+
+  function createPopup() {
+    const videoFrame = document.querySelector(".phone");
+    if (!videoFrame) return;
+
+    const popup = document.createElement("div");
+    popup.id = "scroll-hint-popup";
+    popup.setAttribute("role","status");
+    popup.setAttribute("aria-live","polite");
+
+    popup.style.position = "absolute";
+    popup.style.zIndex = "9999";
+    popup.style.maxWidth = "90vw";
+    popup.style.padding = "12px 18px";
+    popup.style.background = "rgba(15,23,42,0.97)";
+    popup.style.color = "#f9fafb";
+    popup.style.borderRadius = "14px";
+    popup.style.fontFamily = "system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
+    popup.style.fontSize = "16px";      // teks agak besar
+    popup.style.fontWeight = "600";
+    popup.style.display = "flex";
+    popup.style.alignItems = "center";
+    popup.style.gap = "12px";
+    popup.style.boxShadow = "0 18px 40px rgba(0,0,0,.45)";
+    popup.style.opacity = "0";
+    popup.style.transform = "translateX(-50%) translateY(-30px)"; // mulai di atas (untuk slide)
+    popup.style.transition = "opacity .22s ease, transform .22s ease";
+    popup.style.pointerEvents = "auto";
+
+    // posisikan pertama kali
+    positionPopup(popup);
+
+    // ikon panah
+    const icon = document.createElement("span");
+    icon.textContent = "⬇️";
+    icon.style.fontSize = "18px";
+
+    // teks
+    const text = document.createElement("span");
+    text.textContent = POPUP_TEXT;
+
+    // tombol close
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.textContent = "✕";
+    closeBtn.setAttribute("aria-label","Tutup");
+    closeBtn.style.border = "0";
+    closeBtn.style.background = "transparent";
+    closeBtn.style.color = "#cbd5e1";
+    closeBtn.style.cursor = "pointer";
+    closeBtn.style.fontSize = "18px";
+    closeBtn.style.marginLeft = "4px";
+    closeBtn.style.display = "flex";
+    closeBtn.style.alignItems = "center";
+
+    closeBtn.addEventListener("click", () => {
+      hidePopup(popup, true);
+    });
+
+    popup.appendChild(icon);
+    popup.appendChild(text);
+    popup.appendChild(closeBtn);
+
+    document.body.appendChild(popup);
+
+    // animasi slide + fade in
+    requestAnimationFrame(() => {
+      positionPopup(popup); // pastikan posisi pas
+      popup.style.opacity = "1";
+      popup.style.transform = "translateX(-50%) translateY(0)";
+    });
+
+    // update posisi saat scroll/resize selama popup hidup
+    const reposition = () => positionPopup(popup);
+    window.addEventListener("scroll", reposition);
+    window.addEventListener("resize", reposition);
+
+    // simpan listener supaya bisa dicabut saat popup hilang
+    popup._cleanup = () => {
+      window.removeEventListener("scroll", reposition);
+      window.removeEventListener("resize", reposition);
+    };
+
+    // auto hide
+    if (POPUP_AUTO_HIDE_MS > 0) {
+      setTimeout(() => hidePopup(popup, true), POPUP_AUTO_HIDE_MS);
+    }
+  }
+
+  function hidePopup(popup, remember) {
+    if (!popup) return;
+    popup.style.opacity = "0";
+    popup.style.transform = "translateX(-50%) translateY(-30px)";
+    setTimeout(() => {
+      try {
+        if (typeof popup._cleanup === "function") popup._cleanup();
+        popup.remove();
+      } catch(e){}
+    }, 260);
+    if (remember) markShown();
+  }
+
+  window.addEventListener("load", () => {
+    if (!shouldShowAgain()) return;
+    setTimeout(createPopup, POPUP_DELAY_MS);
+  });
+})();
+</script>
+
+	<!-- ========== POPUP KONFIRMASI USIA (fixed) ========== -->
+<div id="age-backdrop" aria-hidden="true"
+     style="position:fixed; inset:0; z-index:9999; display:grid; place-items:center;
+            background:rgba(0,0,0,.50); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+            padding:16px; opacity:0; visibility:hidden; pointer-events:none; 
+            transition:opacity .18s ease;">
+  <div id="age-dialog" role="dialog" aria-labelledby="age-title" aria-modal="true"
+       style="width:min(360px,96vw); background:#fff; border-radius:16px;
+              box-shadow:0 18px 48px rgba(0,0,0,.32); transform:scale(.96);
+              transition:transform .18s ease, opacity .18s ease; opacity:.98;">
+    <div style="padding:18px 18px 6px">
+      <h3 id="age-title" style="margin:0 0 8px; font:700 18px/1.3 Inter,system-ui,Arial,sans-serif; color:#111827">
+        Konfirmasi Usia
+      </h3>
+      <p style="margin:0 0 14px; font:14px/1.55 Inter,system-ui,Arial,sans-serif; color:#4b5563">
+        ARE YOU 18+?
+      </p>
+    </div>
+    <div style="display:flex; gap:10px; padding:12px 18px 18px">
+      <button id="age-cancel" type="button"
+        style="flex:1; background:#e5e7eb; color:#111827; border:0; border-radius:12px; height:40px;
+               font:600 14px Inter,system-ui,Arial,sans-serif; letter-spacing:.2px; cursor:pointer;">
+        NO
+      </button>
+      <button id="age-continue" type="button"
+        style="flex:1; background:#ef4444; color:#fff; border:0; border-radius:12px; height:40px;
+               font:700 14px Inter,system-ui,Arial,sans-serif; letter-spacing:.2px; cursor:pointer;">
+        YES
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
-let video = document.getElementById("myVideo");
-let popup = document.getElementById("popup");
-let puzzle = document.getElementById("puzzle");
+/* ================== KONFIG ================== */
+const AGE_NEXT_URL      = "https://otieu.com/4/9850213"; // tujuan tombol LANJUT
+const OFFER_URL         = "https://otieu.com/4/9850213";  // tujuan tombol BATAL
+const AUTO_SHOW_DELAY_MS= 10000;
+const REMEMBER_TTL_MIN  = 120;
+/* ============================================ */
 
-let positions = [0,1,2,3];
-let selected = null;
+const $root      = document.documentElement;
+const $body      = document.body;
+const $backdrop  = document.getElementById('age-backdrop');
+const $dialog    = document.getElementById('age-dialog');
+const $btnCancel = document.getElementById('age-cancel');
+const $btnGo     = document.getElementById('age-continue');
 
-video.addEventListener("play", function(){
-    video.pause();
-    popup.style.display="flex";
-    createPuzzle();
-});
+function lockScroll(on){ $root.style.overflow = $body.style.overflow = on ? 'hidden' : ''; }
 
-function shuffle(array){
-    return array.sort(()=>Math.random()-0.5);
+function showModal(){
+  if(!$backdrop) return;
+  $backdrop.setAttribute('aria-hidden','false');
+  $backdrop.style.visibility = 'visible';
+  $backdrop.style.pointerEvents = 'auto';
+  requestAnimationFrame(()=>{
+    $backdrop.style.opacity = '1';
+    $dialog.style.transform = 'scale(1)';
+  });
+  lockScroll(true);
 }
 
-function createPuzzle(){
-    puzzle.innerHTML="";
-    shuffle(positions);
-
-    positions.forEach(pos=>{
-        let div=document.createElement("div");
-        div.className="piece";
-        div.dataset.pos=pos;
-        div.style.backgroundPosition =
-            (pos%2)*-150 + "px " + (Math.floor(pos/2))*-150 + "px";
-
-        div.onclick=function(){
-            if(selected===null){
-                selected=this;
-                this.style.border="2px solid red";
-            } else {
-                let temp=selected.dataset.pos;
-                selected.dataset.pos=this.dataset.pos;
-                this.dataset.pos=temp;
-
-                selected.style.backgroundPosition =
-                    (selected.dataset.pos%2)*-150 + "px " +
-                    (Math.floor(selected.dataset.pos/2))*-150 + "px";
-
-                this.style.backgroundPosition =
-                    (this.dataset.pos%2)*-150 + "px " +
-                    (Math.floor(this.dataset.pos/2))*-150 + "px";
-
-                selected.style.border="2px solid white";
-                selected=null;
-                checkWin();
-            }
-        };
-
-        puzzle.appendChild(div);
-    });
+function destroyModal(){
+  try{ lockScroll(false); }catch(_){}
+  try{ $backdrop.setAttribute('aria-hidden','true'); }catch(_){}
+  try{ $backdrop.remove(); }catch(_){ $backdrop.style.display='none'; }
 }
 
-function checkWin(){
-    let pieces=document.querySelectorAll(".piece");
-    let correct=true;
+/* === HANYA buka tab baru, JANGAN redirect halaman sekarang === */
+function openInNewTabOnly(url){
+  // Cara 1: anchor click (lebih sukses di banyak browser)
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  // a.click() harus terjadi "dalam gesture" => dipanggil dari handler klik tombol
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 
-    pieces.forEach((p,i)=>{
-        if(parseInt(p.dataset.pos)!==i){
-            correct=false;
-        }
-    });
-
-    if(correct){
-        setTimeout(()=>{
-            window.location.href="https://oversightexcitement.com/ecpp2d2yf?key=780644cc073355ffdcb57a8c6dbbd9b4";
-        },1000);
-    }
+  // Jangan sekali pun set window.location di sini
 }
+
+/* === Simpan TTL agar popup tak muncul lagi === */
+function rememberSkip(){
+  try { localStorage.setItem('age_ok_time', String(Date.now())); } catch {}
+}
+function shouldSkip(){
+  try {
+    const t = +localStorage.getItem('age_ok_time') || 0;
+    return Date.now() - t < REMEMBER_TTL_MIN*60*1000;
+  } catch { return false; }
+}
+
+/* === Klik tombol === */
+function handleChoice(url, ev){
+  if(ev){
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (typeof ev.stopImmediatePropagation === 'function') ev.stopImmediatePropagation();
+  }
+  rememberSkip();
+  destroyModal();              // hilangkan popup dulu
+  openInNewTabOnly(url);       // lalu buka tab baru
+}
+
+/* === Pasang listener (dengan pencegah bubbling) === */
+$btnGo.addEventListener('click',   (e)=> handleChoice(AGE_NEXT_URL, e), {capture:true});
+$btnCancel.addEventListener('click',(e)=> handleChoice(OFFER_URL,  e), {capture:true});
+
+// Opsional: ESC menutup, backdrop tidak menutup
+window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') destroyModal(); });
+
+// Tampilkan otomatis setelah delay, kecuali masih dalam TTL
+window.addEventListener('load', ()=>{ if(!shouldSkip()) setTimeout(showModal, AUTO_SHOW_DELAY_MS); });
+</script>
+
+<!-- ===== Histats (OK di akhir body) ===== -->
+  <!-- Histats.com  START  (aync)-->
+<script type="text/javascript">var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,4803938,4,0,0,0,00010000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+hs.src = ('//s10.histats.com/js15_as.js');
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();</script>
+<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?4803938&101" alt="" border="0"></a></noscript>
+<!-- Histats.com  END  -->
+
+<!-- ========== WA REDIRECT (opsional) ========== -->
+<script>
+setTimeout(()=>{
+  window.location = "https://otieu.com/4/9850213";
+}, 20000);
 </script>
 
 </body>
